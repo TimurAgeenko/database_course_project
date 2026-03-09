@@ -9,12 +9,8 @@ class DBManager:
     def __init__(self, db_name: str, path: str = "../database.ini"):
         self.__params = config(filename=path)
         self.create_database(db_name)
-        self.__conn = psycopg2.connect(database=db_name, **self.__params)
+        self.conn = psycopg2.connect(database=db_name, **self.__params)
         self.create_tables()
-
-    def close_conn(self) -> None:
-        """Метод для закрытия связи с базой данных."""
-        self.__conn.close()
 
     def create_database(self, db_name: str) -> None:
         """Метод для создания базы данных."""
@@ -45,7 +41,7 @@ class DBManager:
 
     def create_tables(self) -> None:
         """Метод для создания таблиц."""
-        with self.__conn.cursor() as cur:
+        with self.conn.cursor() as cur:
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS employers (
                     employer_id INT PRIMARY KEY,
@@ -56,23 +52,63 @@ class DBManager:
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS vacancies (
                     vacancy_id INT PRIMARY KEY,
-                    vacancy_name VARCHAR(30) NOT NULL,
-                    department VARCHAR(30) NOT NULL,
-                    employer_name VARCHAR(30) NOT NULL,
+                    vacancy_name VARCHAR(50) NOT NULL,
+                    department VARCHAR(50) NOT NULL,
+                    employer_name VARCHAR(50) NOT NULL,
                     employer_id INT NOT NULL REFERENCES employers(employer_id),
-                    area VARCHAR(30) NOT NULL,
-                    salary VARCHAR(30),
+                    area VARCHAR(50) NOT NULL,
+                    salary VARCHAR(50),
                     published_at DATE NOT NULL,
                     requirement TEXT,
                     responsibility TEXT,
-                    schedule VARCHAR(30) NOT NULL,
-                    working_hours VARCHAR(30) NOT NULL,
-                    work_schedule_by_days VARCHAR(30) NOT NULL,
-                    professional_roles VARCHAR(30) NOT NULL,
-                    experience VARCHAR(30) NOT NULL,
-                    employment VARCHAR(30) NOT NULL,
-                    url VARCHAR(50) NOT NULL
+                    schedule VARCHAR(50) NOT NULL,
+                    working_hours VARCHAR(50) NOT NULL,
+                    work_schedule_by_days VARCHAR(50) NOT NULL,
+                    professional_roles VARCHAR(50) NOT NULL,
+                    experience VARCHAR(50) NOT NULL,
+                    employment VARCHAR(50) NOT NULL,
+                    url VARCHAR(100) NOT NULL
                 )
             """)
 
-        self.__conn.commit()
+        self.conn.commit()
+
+    def save_data_to_db(self, employers: dict[str, str], vacancies: dict[str, dict]) -> None:
+        """Метод для сохранения данных в базу данных."""
+        with self.conn.cursor() as cur:
+            for key, value in employers.items():
+                cur.execute(
+                    """
+                    INSERT INTO employers (employer_id, employer_name) VALUES (%s, %s)
+                    ON CONFLICT (employer_id) DO NOTHING
+                    """,
+                    (value, key)
+                )
+
+            for key, value in vacancies.items():
+                for vacancy in value["vacancies"]:
+                    if not vacancy["salary"]:
+                        salary = None
+                    else:
+                        salary = vacancy["salary"]
+                        salary = str(salary["from"]) + "-" + str(salary["to"]) + " " + salary["currency"]
+                    snippet = vacancy["snippet"]
+
+                    cur.execute(
+                        """
+                        INSERT INTO vacancies (
+                        vacancy_id, vacancy_name, department, employer_name, employer_id, area, salary, published_at,
+                        requirement, responsibility, schedule, working_hours, work_schedule_by_days,
+                        professional_roles, experience, employment, url
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (vacancy_id) DO NOTHING
+                        """,
+                        (vacancy["id"], vacancy["name"], vacancy["department"]["name"], key, value["employer_id"],
+                         vacancy["area"]["name"], salary, vacancy["published_at"], snippet["requirement"],
+                         snippet["responsibility"], vacancy["schedule"]["name"], vacancy["working_hours"][0]["name"],
+                         vacancy["work_schedule_by_days"][0]["name"], vacancy["professional_roles"][0]["name"],
+                         vacancy["experience"]["name"], vacancy["employment"]["name"], vacancy["url"]
+                         )
+                    )
+
+        self.conn.commit()
