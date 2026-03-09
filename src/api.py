@@ -23,23 +23,35 @@ class HeadHunterAPIHandler:
 
         for employer in employers:
             employers_dict = {}
+
+            url = self.__url + "employers"
             params = {
                 "text": employer,
                 "only_with_vacancies": True,
                 "sort_by": "by_vacancies_open"
             }
 
-            response = requests.get(self.__url, headers=self.__headers, params=params)
+            response = requests.get(url, headers=self.__headers, params=params)
             response_json = response.json()
 
             for item in response_json["items"]:
                 employers_dict[item["name"]] = item["id"]
 
-            result["requested_name"] = employer
-            result["founded_employers"] = employers_dict
+            result[employer] = employers_dict
 
         return result
 
-    def get_vacancies(self) -> list[dict[str, Any]]:
+    def get_vacancies(self, employers: dict[str, str]) -> dict[str, Any]:
         """Метод для получения списка с вакансиями по работодателям."""
-        pass
+        result = {}
+
+        for key, value in employers.items():
+            url = self.__url + "vacancies"
+            params = {"employer_id": value}
+
+            response = requests.get(url, headers=self.__headers, params=params)
+            response_json = response.json()
+
+            result[key] = {"employer_id": value, "vacancies": response_json["items"]}
+
+        return result
