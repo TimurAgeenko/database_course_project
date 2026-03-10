@@ -57,7 +57,10 @@ class DBManager:
                     employer_name VARCHAR(50) NOT NULL,
                     employer_id INT NOT NULL REFERENCES employers(employer_id),
                     area VARCHAR(50) NOT NULL,
-                    salary VARCHAR(50),
+                    salary_str VARCHAR(50),
+                    salary_from INT,
+                    salary_to INT,
+                    salary_currency VARCHAR(50),
                     published_at DATE NOT NULL,
                     requirement TEXT,
                     responsibility TEXT,
@@ -89,6 +92,8 @@ class DBManager:
                 for vacancy in value["vacancies"]:
                     if not vacancy["salary"]:
                         salary = None
+                    elif not vacancy["salary"]["to"]:
+                        salary = vacancy["salary"]["from"]
                     else:
                         salary = vacancy["salary"]
                         salary = str(salary["from"]) + "-" + str(salary["to"]) + " " + salary["currency"]
@@ -97,10 +102,10 @@ class DBManager:
                     cur.execute(
                         """
                         INSERT INTO vacancies (
-                        vacancy_id, vacancy_name, department, employer_name, employer_id, area, salary, published_at,
-                        requirement, responsibility, schedule, working_hours, work_schedule_by_days,
-                        professional_roles, experience, employment, url
-                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        vacancy_id, vacancy_name, department, employer_name, employer_id, area, salary_str,
+                        salary_from, salary_to, salary_currency, published_at, requirement, responsibility, schedule,
+                        working_hours, work_schedule_by_days, professional_roles, experience, employment, url
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         ON CONFLICT (vacancy_id) DO NOTHING
                         """,
                         (
@@ -111,6 +116,9 @@ class DBManager:
                             value["employer_id"],
                             vacancy["area"]["name"],
                             salary,
+                            vacancy["salary"]["from"],
+                            vacancy["salary"]["to"],
+                            vacancy["salary"]["currency"],
                             vacancy["published_at"],
                             snippet["requirement"],
                             snippet["responsibility"],
@@ -140,7 +148,22 @@ class DBManager:
         названия вакансии, зарплаты и ссылки на вакансию."""
         cur = self.conn.cursor()
 
-        cur.execute("SELECT employer_name, vacancy_name, salary, url FROM vacancies")
+        cur.execute("SELECT employer_name, vacancy_name, salary_str, url FROM vacancies")
         vacancies = cur.fetchall()
 
         return vacancies
+
+    def get_avg_salary(self):
+        """получает среднюю зарплату по вакансиям"""
+        cur = self.conn.cursor()
+
+        cur.execute(
+            """
+            SELECT AVG((salary_from + salary_to) / 2) as average
+            FROM VACANCIES WHERE salary_str IS NOT NULL AND
+            salary_to IS NOT NULL AND salary_currency = 'RUR'
+            """
+        )
+        average = cur.fetchone()[0]
+
+        return average

@@ -22,7 +22,7 @@ def test_db_manager_save_data_to_db(employers, vacancies):
     employer = cur.fetchall()
     assert employer == [(1740, "Яндекс")]
 
-    cur.execute("SELECT vacancy_id, vacancy_name, salary FROM vacancies")
+    cur.execute("SELECT vacancy_id, vacancy_name, salary_str FROM vacancies")
     vacancy = cur.fetchall()
     assert vacancy == [(130355798, "Специалист по договорной работе", "50000-70000 RUR")]
 
@@ -60,6 +60,19 @@ def test_db_manager_get_all_vacancies(employers, vacancies):
             "https://api.hh.ru/vacancies/130355798?host=hh.ru",
         )
     ]
+
+    db_manager.conn.close()
+
+    DBManager.drop_database("test", "./database.ini")
+
+
+def test_db_manager_get_avg_salary(employers, vacancies):
+    db_manager = DBManager("test", "./database.ini")
+    db_manager.save_data_to_db(employers, vacancies)
+
+    average_salary = db_manager.get_avg_salary()
+
+    assert average_salary == 60000.0
 
     db_manager.conn.close()
 
