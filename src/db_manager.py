@@ -134,3 +134,13 @@ class DBManager:
         employer, vacancies_count = cur.fetchone()
 
         return employer, vacancies_count
+
+    def get_all_vacancies(self) -> list[tuple[str, str, str, str]]:
+        """Метод для получения списка всех вакансий с указанием названия компании,
+        названия вакансии, зарплаты и ссылки на вакансию."""
+        cur = self.conn.cursor()
+
+        cur.execute("SELECT employer_name, vacancy_name, salary, url FROM vacancies")
+        vacancies = cur.fetchall()
+
+        return vacancies

@@ -20,11 +20,11 @@ def test_db_manager_save_data_to_db(employers, vacancies):
 
     cur.execute("SELECT employer_id, employer_name FROM employers")
     employer = cur.fetchall()
-    assert employer == [(1740, 'Яндекс')]
+    assert employer == [(1740, "Яндекс")]
 
     cur.execute("SELECT vacancy_id, vacancy_name, salary FROM vacancies")
     vacancy = cur.fetchall()
-    assert vacancy == [(130355798, 'Специалист по договорной работе', '50000-70000 RUR')]
+    assert vacancy == [(130355798, "Специалист по договорной работе", "50000-70000 RUR")]
 
     cur.close()
     db_manager.conn.close()
@@ -40,6 +40,26 @@ def test_db_manager_get_companies_and_vacancies_count(employers, vacancies):
 
     assert employer == "Яндекс"
     assert vacancies_count == 1
+
+    db_manager.conn.close()
+
+    DBManager.drop_database("test", "./database.ini")
+
+
+def test_db_manager_get_all_vacancies(employers, vacancies):
+    db_manager = DBManager("test", "./database.ini")
+    db_manager.save_data_to_db(employers, vacancies)
+
+    vacancies = db_manager.get_all_vacancies()
+
+    assert vacancies == [
+        (
+            "Яндекс",
+            "Специалист по договорной работе",
+            "50000-70000 RUR",
+            "https://api.hh.ru/vacancies/130355798?host=hh.ru",
+        )
+    ]
 
     db_manager.conn.close()
 
