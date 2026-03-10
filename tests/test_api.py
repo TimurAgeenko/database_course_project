@@ -17,11 +17,7 @@ def test_headhunter_api_get_employers_id(mock_get):
     api_handler = HeadHunterAPIHandler()
 
     mock_get.return_value.json.return_value = {
-        "items": [
-            {"id": 1, "name": "emp1"},
-            {"id": 2, "name": "emp2"},
-            {"id": 3, "name": "emp3"}
-        ]
+        "items": [{"id": 1, "name": "emp1"}, {"id": 2, "name": "emp2"}, {"id": 3, "name": "emp3"}]
     }
 
     employers_info = api_handler.get_employers_id(["Example"])
@@ -41,11 +37,7 @@ def test_headhunter_api_get_employers_id(mock_get):
 def test_headhunter_api_get_vacancies(mock_get):
     api_handler = HeadHunterAPIHandler()
 
-    vacancies = [
-        {"id": 1, "name": "vac1"},
-        {"id": 2, "name": "vac2"},
-        {"id": 3, "name": "vac3"}
-    ]
+    vacancies = [{"id": 1, "name": "vac1"}, {"id": 2, "name": "vac2"}, {"id": 3, "name": "vac3"}]
     mock_get.return_value.json.return_value = {"items": vacancies}
 
     vacancies_info = api_handler.get_vacancies({"Example": "1"})
