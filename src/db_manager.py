@@ -143,7 +143,7 @@ class DBManager:
 
         return employer, vacancies_count
 
-    def get_all_vacancies(self) -> list[tuple[str, str, str, str]]:
+    def get_all_vacancies(self) -> list[tuple]:
         """Метод для получения списка всех вакансий с указанием названия компании,
         названия вакансии, зарплаты и ссылки на вакансию."""
         cur = self.conn.cursor()
@@ -168,7 +168,7 @@ class DBManager:
 
         return average
 
-    def get_vacancies_with_higher_salary(self):
+    def get_vacancies_with_higher_salary(self) -> list[tuple]:
         """Метод для получения списка всех вакансий, у которых верхний край
         зарплатной вилки выше средней зарплаты по всем вакансиям."""
         cur = self.conn.cursor()
@@ -178,6 +178,20 @@ class DBManager:
             f"""
             SELECT * FROM vacancies
             WHERE salary_to > {average_salary}
+            """
+        )
+        vacancies = cur.fetchall()
+
+        return vacancies
+
+    def get_vacancies_with_keyword(self, keywords: str) -> list[tuple]:
+        """Метод для получения списка всех вакансий, в названии которых содержатся переданные в метод слова."""
+        cur = self.conn.cursor()
+
+        cur.execute(
+            f"""
+            SELECT * FROM vacancies
+            WHERE vacancy_name LIKE '%{keywords}%'
             """
         )
         vacancies = cur.fetchall()
