@@ -77,3 +77,16 @@ def test_db_manager_get_avg_salary(employers, vacancies):
     db_manager.conn.close()
 
     DBManager.drop_database("test", "./database.ini")
+
+
+def test_db_manager_get_vacancies_with_higher_salary(employers, vacancies):
+    db_manager = DBManager("test", "./database.ini")
+    db_manager.save_data_to_db(employers, vacancies)
+
+    vacancies = db_manager.get_vacancies_with_higher_salary()
+
+    assert vacancies[0][0] == 130355798
+
+    db_manager.conn.close()
+
+    DBManager.drop_database("test", "./database.ini")

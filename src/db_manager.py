@@ -167,3 +167,19 @@ class DBManager:
         average = cur.fetchone()[0]
 
         return average
+
+    def get_vacancies_with_higher_salary(self):
+        """Метод для получения списка всех вакансий, у которых верхний край
+        зарплатной вилки выше средней зарплаты по всем вакансиям."""
+        cur = self.conn.cursor()
+        average_salary = self.get_avg_salary()
+
+        cur.execute(
+            f"""
+            SELECT * FROM vacancies
+            WHERE salary_to > {average_salary}
+            """
+        )
+        vacancies = cur.fetchall()
+
+        return vacancies
