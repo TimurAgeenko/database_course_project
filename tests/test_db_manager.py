@@ -30,3 +30,17 @@ def test_db_manager_save_data_to_db(employers, vacancies):
     db_manager.conn.close()
 
     DBManager.drop_database("test", "./database.ini")
+
+
+def test_db_manager_get_companies_and_vacancies_count(employers, vacancies):
+    db_manager = DBManager("test", "./database.ini")
+    db_manager.save_data_to_db(employers, vacancies)
+
+    employer, vacancies_count = db_manager.get_companies_and_vacancies_count()
+
+    assert employer == "Яндекс"
+    assert vacancies_count == 1
+
+    db_manager.conn.close()
+
+    DBManager.drop_database("test", "./database.ini")

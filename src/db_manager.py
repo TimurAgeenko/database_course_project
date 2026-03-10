@@ -103,12 +103,34 @@ class DBManager:
                         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         ON CONFLICT (vacancy_id) DO NOTHING
                         """,
-                        (vacancy["id"], vacancy["name"], vacancy["department"]["name"], key, value["employer_id"],
-                         vacancy["area"]["name"], salary, vacancy["published_at"], snippet["requirement"],
-                         snippet["responsibility"], vacancy["schedule"]["name"], vacancy["working_hours"][0]["name"],
-                         vacancy["work_schedule_by_days"][0]["name"], vacancy["professional_roles"][0]["name"],
-                         vacancy["experience"]["name"], vacancy["employment"]["name"], vacancy["url"]
-                         )
+                        (
+                            vacancy["id"],
+                            vacancy["name"],
+                            vacancy["department"]["name"],
+                            key,
+                            value["employer_id"],
+                            vacancy["area"]["name"],
+                            salary,
+                            vacancy["published_at"],
+                            snippet["requirement"],
+                            snippet["responsibility"],
+                            vacancy["schedule"]["name"],
+                            vacancy["working_hours"][0]["name"],
+                            vacancy["work_schedule_by_days"][0]["name"],
+                            vacancy["professional_roles"][0]["name"],
+                            vacancy["experience"]["name"],
+                            vacancy["employment"]["name"],
+                            vacancy["url"]
+                        )
                     )
 
         self.conn.commit()
+
+    def get_companies_and_vacancies_count(self) -> tuple[str, int]:
+        """Метод для получения списка всех компаний и количества вакансий у каждой компании."""
+        cur = self.conn.cursor()
+
+        cur.execute("SELECT employer_name, COUNT(*) as count FROM vacancies GROUP BY employer_name")
+        employer, vacancies_count = cur.fetchone()
+
+        return employer, vacancies_count
