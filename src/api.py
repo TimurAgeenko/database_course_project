@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Any
 
@@ -8,20 +9,28 @@ from dotenv import load_dotenv
 class HeadHunterAPIHandler:
     """Класс для обработки API-запросов к сайту HeadHunter"""
 
-    def __init__(self):
+    def __init__(self, path: str = "../employers.json"):
         load_dotenv()
         self.__url = os.getenv("HEADHUNTER_API_URL")
         self.__headers = {"User-Agent": os.getenv("HEADHUNTER_HEADER")}
-        self.__employers_id = []
+        self.__employers = []
+        self.get_employers_list(path)
 
     def __repr__(self):
         return f"URL: {self.__url}, headers: {self.__headers["User-Agent"]}"
 
-    def get_employers_id(self, employers: list[str]) -> dict[str, Any]:
+    def get_employers_list(self, path: str = "../employers.json") -> None:
+        """Метод для получения списка работодателей."""
+        with open(path, "r") as f:
+            data = json.load(f)
+
+        self.__employers = data
+
+    def get_employers_id(self) -> dict[str, Any]:
         """Метод для получения идентификаторов работодателей по их названиям."""
         result = {}
 
-        for employer in employers:
+        for employer in self.__employers:
             employers_dict = {}
 
             url = self.__url + "employers"
