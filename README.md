@@ -26,18 +26,25 @@ HeadHunter's Hunter - это приложение для поиска работ
 ## Использование
 
 1. Класс HeadHunterAPIHandler используется для взаимодействия с сайтом HeadHunter
-   и получения данных о работодателях и вакансиях.
+   и получения данных о работодателях и вакансиях. При инициализации объекта нужно передать путь до файла
+   "employers.json", если путь не передан, то будет использоваться значение по умолчанию: "../employers.json"
    ```
-   Чтобы создать экземпляр класса никаких аргументов передавать не нужно:
-   api_handler = HeadHunterAPIHandler()
+   api_handler = HeadHunterAPIHandler() 
+   ```
+   
+2. У класса HeadHunterAPIHandler есть метод get_employers_list, который используется для
+   записи списка работодателей в атрибут объекта класса. При использовании нужно передать путь до файла
+   "employers.json", если путь не передан, то будет использоваться значение по умолчанию: "../employers.json".
+   ```
+   api_handler = HeadHunterAPIHandler() # При инициализации объекта метод вызывается автоматически
    ```
 
-2. У класса HeadHunterAPIHandler есть метод get_employers_id, который используется для получения
-   идентификаторов работодателей по их названиям.
+3. У класса HeadHunterAPIHandler есть метод get_employers_id, который используется для получения
+   идентификаторов работодателей по их названиям. Список работодателей хранится в файле employers.json.
    ```
    api_handler = HeadHunterAPIHandler()
    
-   employers = api_handler.get_employers_id(["Яндекс"])
+   employers = api_handler.get_employers_id()
    print(employers)
    
    # Выведет
@@ -54,7 +61,7 @@ HeadHunter's Hunter - это приложение для поиска работ
    }
    ```
 
-3. У класса HeadHunterAPIHandler есть метод get_vacancies, который используется для получения
+4. У класса HeadHunterAPIHandler есть метод get_vacancies, который используется для получения
    информации о вакансиях, размещенных полученными из метода get_employers_id работодателями.
    ```
    api_handler = HeadHunterAPIHandler()
@@ -75,7 +82,7 @@ HeadHunter's Hunter - это приложение для поиска работ
    }
    ```
 
-4. Функция config используется для парсинга параметров для подключения к базе данных из файла database.ini.
+5. Функция config используется для парсинга параметров для подключения к базе данных из файла database.ini.
    При вызове нужно передать два аргумента: filename и section. Если их не передать, будут использоваться
    значения по умолчанию: filename="../database.ini", section="postgresql".
    ```
@@ -92,51 +99,48 @@ HeadHunter's Hunter - это приложение для поиска работ
    }
    ```
 
-5. Класс DBManager используется для взаимодействия с базой данных. При инициализации объекта нужно передать
+6. Класс DBManager используется для взаимодействия с базой данных. При инициализации объекта нужно передать
    название для базы данных и путь к файлу database.ini, если путь не передан, то по умолчанию будет передан
    следующий путь: "../database.ini". При инициализации объекта создаются база данных и две таблицы: employers и
    vacancies, если база данных с переданным названием существует, в консоль выведется сообщение:
    "База данных с таким именем уже существует."
    ```
-   Создание экземпляра класса:
    db_manager = DBManager("test")
    ```
    
-6. У класса DBManager есть метод create_database, который используется для создания базы данных.
+7. У класса DBManager есть метод create_database, который используется для создания базы данных.
    ```
-   db_manager = DBManager("test")
+   db_manager = DBManager("test") # При инициализации метод вызывается автоматически
    
    db_manager.create_database("test") # Выведет "База данных с таким именем уже существует."
    
    db_manager.create_database("test1") # Создание новой базы данных
    ```
    
-7. У класса DBManager есть метод drop_database, который используется для удаления базы данных.
+8. У класса DBManager есть метод drop_database, который используется для удаления базы данных.
    ```
    db_manager = DBManager("test")
    
    db_manager.drop_database("test")
    ```
    
-8. У класса DBManager есть метод create_tables, который используется для создания двух таблиц: employers и vacancies.
+9. У класса DBManager есть метод create_tables, который используется для создания двух таблиц: employers и vacancies.
    ```
-   db_manager = DBManager("test")
-   
-   db_manager.create_tables() # Ничего не произойдет, потому что при инициализации таблицы создаются автоматически
+   db_manager = DBManager("test") # При инициализации метод вызывается автоматически
    ```
    
-9. У класса DBManager есть метод save_data_to_db, который используется для сохранения данных о работодателях
-   и вакансиях в соответствующие таблицы в базе данных.
-   ```
-   db_manager = DBManager("test")
+10. У класса DBManager есть метод save_data_to_db, который используется для сохранения данных о работодателях
+    и вакансиях в соответствующие таблицы в базе данных.
+    ```
+    db_manager = DBManager("test")
    
-   employers = dict_got_from_api_handler
-   vacancies = dict_got_from_api_handler
+    employers = dict_got_from_api_handler
+    vacancies = dict_got_from_api_handler
    
-   db_manager.save_data_to_db(employers, vacancies)
-   ```
+    db_manager.save_data_to_db(employers, vacancies)
+    ```
    
-10. У класса DBManager есть метод get_companies_and_vacancies_count, который используется
+11. У класса DBManager есть метод get_companies_and_vacancies_count, который используется
     для получения списка всех компаний и количества вакансий у каждой компании.
     ```
     db_manager = DBManager("test")
@@ -148,7 +152,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     [("company_name1", "vacancy_count1"), ("company_name2", "vacancy_count2"), ...]
     ```
     
-11. У класса DBManager есть метод get_all_vacancies, который используется для получения списка всех вакансий
+12. У класса DBManager есть метод get_all_vacancies, который используется для получения списка всех вакансий
     с указанием названия компании, названия вакансии, зарплаты и ссылки на вакансию.
     ```
     db_manager = DBManager("test")
@@ -160,7 +164,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     [("company_name1", "vacancy_name1", "salary1", "url1"), ...]
     ```
     
-12. У класса DBManager есть метод get_avg_salary, который используется для получения средней зарплаты по всем вакансиям.
+13. У класса DBManager есть метод get_avg_salary, который используется для получения средней зарплаты по всем вакансиям.
     ```
     db_manager = DBManager("test")
     
@@ -168,7 +172,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     print(average_salary) # Выведет число
     ```
     
-13. У класса DBManager есть метод get_vacancies_with_higher_salary, используемый для получения
+14. У класса DBManager есть метод get_vacancies_with_higher_salary, используемый для получения
     списка всех вакансий, у которых верхний край зарплатной вилки выше средней зарплаты по всем вакансиям.
     ```
     db_manager = DBManager("test")
@@ -180,7 +184,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     [("vacancy_id1", "vacancy_name1", "department1", "employer_name1", ...), ...]
     ```
     
-14. У класса DBManager есть метод get_vacancies_with_keyword, используемый для получения списка всех вакансий,
+15. У класса DBManager есть метод get_vacancies_with_keyword, используемый для получения списка всех вакансий,
     в названии которых содержатся переданные в метод слова.
     ```
     db_manager = DBManager("test")
