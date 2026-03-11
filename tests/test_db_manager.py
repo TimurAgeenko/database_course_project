@@ -4,12 +4,11 @@ from src.db_manager import DBManager
 def test_db_manager_create_database(capsys):
     db_manager = DBManager("test", "./database.ini")
     db_manager.create_database("test")
-    db_manager.conn.close()
 
     captured = capsys.readouterr()
     assert captured.out == "База данных с таким именем уже существует.\n"
 
-    DBManager.drop_database("test", "./database.ini")
+    db_manager.drop_database("test", "./database.ini")
 
 
 def test_db_manager_save_data_to_db(employers, vacancies):
@@ -27,23 +26,22 @@ def test_db_manager_save_data_to_db(employers, vacancies):
     assert vacancy == [(130355798, "Специалист по договорной работе", "50000-70000 RUR")]
 
     cur.close()
-    db_manager.conn.close()
 
-    DBManager.drop_database("test", "./database.ini")
+    db_manager.drop_database("test", "./database.ini")
 
 
 def test_db_manager_get_companies_and_vacancies_count(employers, vacancies):
     db_manager = DBManager("test", "./database.ini")
     db_manager.save_data_to_db(employers, vacancies)
 
-    employer, vacancies_count = db_manager.get_companies_and_vacancies_count()
+    data = db_manager.get_companies_and_vacancies_count()
+    employer = data[0][0]
+    vacancies_count = data[0][1]
 
     assert employer == "Яндекс"
     assert vacancies_count == 1
 
-    db_manager.conn.close()
-
-    DBManager.drop_database("test", "./database.ini")
+    db_manager.drop_database("test", "./database.ini")
 
 
 def test_db_manager_get_all_vacancies(employers, vacancies):
@@ -61,9 +59,7 @@ def test_db_manager_get_all_vacancies(employers, vacancies):
         )
     ]
 
-    db_manager.conn.close()
-
-    DBManager.drop_database("test", "./database.ini")
+    db_manager.drop_database("test", "./database.ini")
 
 
 def test_db_manager_get_avg_salary(employers, vacancies):
@@ -74,9 +70,7 @@ def test_db_manager_get_avg_salary(employers, vacancies):
 
     assert average_salary == 60000.0
 
-    db_manager.conn.close()
-
-    DBManager.drop_database("test", "./database.ini")
+    db_manager.drop_database("test", "./database.ini")
 
 
 def test_db_manager_get_vacancies_with_higher_salary(employers, vacancies):
@@ -87,9 +81,7 @@ def test_db_manager_get_vacancies_with_higher_salary(employers, vacancies):
 
     assert vacancies[0][0] == 130355798
 
-    db_manager.conn.close()
-
-    DBManager.drop_database("test", "./database.ini")
+    db_manager.drop_database("test", "./database.ini")
 
 
 def test_db_manager_get_vacancies_with_keyword(employers, vacancies):
@@ -102,5 +94,4 @@ def test_db_manager_get_vacancies_with_keyword(employers, vacancies):
     vacancies = db_manager.get_vacancies_with_keyword("машинам")
     assert vacancies == []
 
-    db_manager.conn.close()
-    DBManager.drop_database("test", "./database.ini")
+    db_manager.drop_database("test", "./database.ini")

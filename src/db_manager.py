@@ -26,9 +26,10 @@ class DBManager:
         cur.close()
         conn.close()
 
-    @staticmethod
-    def drop_database(db_name: str, db_params_path: str = "../database.ini") -> None:
+    def drop_database(self, db_name: str, db_params_path: str = "../database.ini") -> None:
         """Метод для удаления базы данных."""
+        self.conn.close()
+
         params = config(filename=db_params_path)
         conn = psycopg2.connect(database="postgres", **params)
         conn.autocommit = True
@@ -90,14 +91,24 @@ class DBManager:
 
             for key, value in vacancies.items():
                 for vacancy in value["vacancies"]:
-                    if not vacancy["salary"]:
-                        salary = None
-                    elif not vacancy["salary"]["to"]:
-                        salary = vacancy["salary"]["from"]
-                    else:
-                        salary = vacancy["salary"]
-                        salary = str(salary["from"]) + "-" + str(salary["to"]) + " " + salary["currency"]
+                    salary = vacancy["salary"]
                     snippet = vacancy["snippet"]
+
+                    if not vacancy["salary"]:
+                        salary_str = None
+                        salary_from = None
+                        salary_to = None
+                        salary_currency = None
+                    elif not vacancy["salary"]["to"]:
+                        salary_str = vacancy["salary"]["from"]
+                        salary_from = vacancy["salary"]["from"]
+                        salary_to = None
+                        salary_currency = vacancy["salary"]["currency"]
+                    else:
+                        salary_from = salary["from"]
+                        salary_to = salary["to"]
+                        salary_currency = salary["currency"]
+                        salary_str = str(salary["from"]) + "-" + str(salary["to"]) + " " + salary["currency"]
 
                     cur.execute(
                         """
@@ -115,10 +126,10 @@ class DBManager:
                             key,
                             value["employer_id"],
                             vacancy["area"]["name"],
-                            salary,
-                            vacancy["salary"]["from"],
-                            vacancy["salary"]["to"],
-                            vacancy["salary"]["currency"],
+                            salary_str,
+                            salary_from,
+                            salary_to,
+                            salary_currency,
                             vacancy["published_at"],
                             snippet["requirement"],
                             snippet["responsibility"],
@@ -134,14 +145,14 @@ class DBManager:
 
         self.conn.commit()
 
-    def get_companies_and_vacancies_count(self) -> tuple[str, int]:
+    def get_companies_and_vacancies_count(self) -> list[tuple[str, int]]:
         """Метод для получения списка всех компаний и количества вакансий у каждой компании."""
         cur = self.conn.cursor()
 
         cur.execute("SELECT employer_name, COUNT(*) as count FROM vacancies GROUP BY employer_name")
-        employer, vacancies_count = cur.fetchone()
+        data = cur.fetchall()
 
-        return employer, vacancies_count
+        return data
 
     def get_all_vacancies(self) -> list[tuple]:
         """Метод для получения списка всех вакансий с указанием названия компании,
@@ -154,7 +165,7 @@ class DBManager:
         return vacancies
 
     def get_avg_salary(self):
-        """получает среднюю зарплату по вакансиям"""
+        """Метод для получения средней зарплаты по всем вакансиям."""
         cur = self.conn.cursor()
 
         cur.execute(
