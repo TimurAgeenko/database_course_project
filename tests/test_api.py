@@ -62,8 +62,7 @@ def test_headhunter_api_get_vacancies(mock_get):
     url = os.getenv("HEADHUNTER_API_URL") + "vacancies"
     headers = {"User-Agent": os.getenv("HEADHUNTER_HEADER")}
 
-    params = {"employer_id": "1"}
-
-    mock_get.assert_called_once_with(url, headers=headers, params=params)
+    params = {"employer_id": "1", "per_page": 100, "page": 10}
+    mock_get.assert_called_with(url, headers=headers, params=params)
 
     os.remove("./test.json")
