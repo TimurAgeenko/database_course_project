@@ -3,6 +3,7 @@ import os
 
 
 def save_data_to_file(filename, data: list, path: str = "../data/") -> None:
+    """Функция для сохранения данных в файл."""
     if not os.path.exists(path):
         os.makedirs(path)
 
