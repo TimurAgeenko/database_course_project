@@ -66,24 +66,22 @@ class DBManager:
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS vacancies (
                     vacancy_id INT PRIMARY KEY,
-                    vacancy_name VARCHAR(50) NOT NULL,
-                    department VARCHAR(50) NOT NULL,
-                    employer_name VARCHAR(50) NOT NULL,
+                    vacancy_name VARCHAR(100) NOT NULL,
+                    department VARCHAR(100),
+                    employer_name VARCHAR(100) NOT NULL,
                     employer_id INT NOT NULL REFERENCES employers(employer_id),
-                    area VARCHAR(50) NOT NULL,
-                    salary_str VARCHAR(50),
+                    area VARCHAR(100) NOT NULL,
+                    salary_str VARCHAR(100),
                     salary_from INT,
                     salary_to INT,
-                    salary_currency VARCHAR(50),
+                    salary_currency VARCHAR(100),
                     published_at DATE NOT NULL,
                     requirement TEXT,
                     responsibility TEXT,
-                    schedule VARCHAR(50) NOT NULL,
-                    working_hours VARCHAR(50) NOT NULL,
-                    work_schedule_by_days VARCHAR(50) NOT NULL,
-                    professional_roles VARCHAR(50) NOT NULL,
-                    experience VARCHAR(50) NOT NULL,
-                    employment VARCHAR(50) NOT NULL,
+                    schedule VARCHAR(100) NOT NULL,
+                    professional_roles VARCHAR(100) NOT NULL,
+                    experience VARCHAR(100) NOT NULL,
+                    employment VARCHAR(100) NOT NULL,
                     url VARCHAR(100) NOT NULL
                 )
             """)
@@ -107,6 +105,11 @@ class DBManager:
                     salary = vacancy["salary"]
                     snippet = vacancy["snippet"]
 
+                    if not vacancy["department"]:
+                        department = None
+                    else:
+                        department = vacancy["department"]["name"]
+
                     if not vacancy["salary"]:
                         salary_str = None
                         salary_from = None
@@ -128,14 +131,14 @@ class DBManager:
                         INSERT INTO vacancies (
                         vacancy_id, vacancy_name, department, employer_name, employer_id, area, salary_str,
                         salary_from, salary_to, salary_currency, published_at, requirement, responsibility, schedule,
-                        working_hours, work_schedule_by_days, professional_roles, experience, employment, url
-                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        professional_roles, experience, employment, url
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         ON CONFLICT (vacancy_id) DO NOTHING
                         """,
                         (
                             vacancy["id"],
                             vacancy["name"],
-                            vacancy["department"]["name"],
+                            department,
                             key,
                             value["employer_id"],
                             vacancy["area"]["name"],
@@ -147,8 +150,6 @@ class DBManager:
                             snippet["requirement"],
                             snippet["responsibility"],
                             vacancy["schedule"]["name"],
-                            vacancy["working_hours"][0]["name"],
-                            vacancy["work_schedule_by_days"][0]["name"],
                             vacancy["professional_roles"][0]["name"],
                             vacancy["experience"]["name"],
                             vacancy["employment"]["name"],
@@ -240,8 +241,8 @@ class DBManager:
         else:
             keywords_string = ""
             for keyword in keywords:
-                keywords_string += f"vacancy_name LIKE '%{keyword}%' AND"
-            keywords_string = keywords_string[:-4]
+                keywords_string += f"vacancy_name LIKE '%{keyword}%' AND "
+            keywords_string = keywords_string[:-5]
 
         cur.execute(
             f"""

@@ -21,7 +21,7 @@ class HeadHunterAPIHandler:
 
     def get_employers_list(self, path: str = "../employers.json") -> None:
         """Метод для получения списка работодателей."""
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         self.__employers = data
@@ -56,11 +56,12 @@ class HeadHunterAPIHandler:
 
         for key, value in employers.items():
             url = self.__url + "vacancies"
-            params = {"employer_id": value}
 
-            response = requests.get(url, headers=self.__headers, params=params)
-            response_json = response.json()
+            for i in range(1, 11):
+                params = {"employer_id": value, "per_page": 100, "page": i}
+                response = requests.get(url, headers=self.__headers, params=params)
+                response_json = response.json()
 
-            result[key] = {"employer_id": value, "vacancies": response_json["items"]}
+                result[key] = {"employer_id": value, "vacancies": response_json["items"]}
 
         return result
