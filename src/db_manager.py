@@ -12,6 +12,19 @@ class DBManager:
         self.conn = psycopg2.connect(database=db_name, **self.__params)
         self.create_tables()
 
+    def is_tables_empty(self):
+        """Метод, служащий для проверки заполненности таблиц в базе данных."""
+        cur = self.conn.cursor()
+
+        cur.execute("SELECT vacancy_name FROM vacancies")
+        data = cur.fetchall()
+
+        cur.close()
+
+        if data:
+            return False
+        return True
+
     def create_database(self, db_name: str) -> None:
         """Метод для создания базы данных."""
         conn = psycopg2.connect(database="postgres", **self.__params)

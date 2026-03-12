@@ -11,6 +11,17 @@ def test_db_manager_create_database(capsys):
     db_manager.drop_database("test", "./database.ini")
 
 
+def test_is_tables_empty(employers, vacancies):
+    db_manager = DBManager("test", "./database.ini")
+
+    assert db_manager.is_tables_empty()
+
+    db_manager.save_data_to_db(employers, vacancies)
+    assert not db_manager.is_tables_empty()
+
+    db_manager.drop_database("test", "./database.ini")
+
+
 def test_db_manager_save_data_to_db(employers, vacancies):
     db_manager = DBManager("test", "./database.ini")
     db_manager.save_data_to_db(employers, vacancies)
