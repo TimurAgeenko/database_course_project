@@ -247,4 +247,3 @@ class DBManager:
             })
 
         return json_data
-
