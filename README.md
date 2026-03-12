@@ -120,7 +120,19 @@ HeadHunter's Hunter - это приложение для поиска работ
    db_manager = DBManager("test")
    ```
    
-8. У класса DBManager есть метод create_database, который используется для создания базы данных.
+8. У класса DBManager есть метод is_tables_empty, который используется для проверки заполненности
+   таблиц в базе данных.
+   ```
+   db_manager = DBManager("test")
+   
+   print(db_manager.is_tables_empty()) # Выведет True
+   
+   # Заполняем таблицы данными
+   
+   print(db_manager.is_tables_empty()) # Выведет False
+   ```
+   
+9. У класса DBManager есть метод create_database, который используется для создания базы данных.
    ```
    db_manager = DBManager("test") # При инициализации метод вызывается автоматически
    
@@ -129,19 +141,19 @@ HeadHunter's Hunter - это приложение для поиска работ
    db_manager.create_database("test1") # Создание новой базы данных
    ```
    
-9. У класса DBManager есть метод drop_database, который используется для удаления базы данных.
+10. У класса DBManager есть метод drop_database, который используется для удаления базы данных.
    ```
    db_manager = DBManager("test")
    
    db_manager.drop_database("test")
    ```
    
-10. У класса DBManager есть метод create_tables, который используется для создания двух таблиц: employers и vacancies.
+11. У класса DBManager есть метод create_tables, который используется для создания двух таблиц: employers и vacancies.
     ```
     db_manager = DBManager("test") # При инициализации метод вызывается автоматически
     ```
    
-11. У класса DBManager есть метод save_data_to_db, который используется для сохранения данных о работодателях
+12. У класса DBManager есть метод save_data_to_db, который используется для сохранения данных о работодателях
     и вакансиях в соответствующие таблицы в базе данных.
     ```
     db_manager = DBManager("test")
@@ -152,7 +164,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     db_manager.save_data_to_db(employers, vacancies)
     ```
    
-12. У класса DBManager есть метод get_companies_and_vacancies_count, который используется
+13. У класса DBManager есть метод get_companies_and_vacancies_count, который используется
     для получения списка всех компаний и количества вакансий у каждой компании.
     ```
     db_manager = DBManager("test")
@@ -164,7 +176,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     [("company_name1", "vacancy_count1"), ("company_name2", "vacancy_count2"), ...]
     ```
     
-13. У класса DBManager есть метод get_all_vacancies, который используется для получения списка всех вакансий
+14. У класса DBManager есть метод get_all_vacancies, который используется для получения списка всех вакансий
     с указанием названия компании, названия вакансии, зарплаты и ссылки на вакансию.
     ```
     db_manager = DBManager("test")
@@ -176,7 +188,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     [("company_name1", "vacancy_name1", "salary1", "url1"), ...]
     ```
     
-14. У класса DBManager есть метод get_avg_salary, который используется для получения средней зарплаты по всем вакансиям.
+15. У класса DBManager есть метод get_avg_salary, который используется для получения средней зарплаты по всем вакансиям.
     ```
     db_manager = DBManager("test")
     
@@ -184,7 +196,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     print(average_salary) # Выведет число
     ```
     
-15. У класса DBManager есть метод get_vacancies_with_higher_salary, используемый для получения
+16. У класса DBManager есть метод get_vacancies_with_higher_salary, используемый для получения
     списка всех вакансий, у которых верхний край зарплатной вилки выше средней зарплаты по всем вакансиям.
     ```
     db_manager = DBManager("test")
@@ -196,7 +208,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     [("vacancy_id1", "vacancy_name1", "department1", "employer_name1", ...), ...]
     ```
     
-16. У класса DBManager есть метод get_vacancies_with_keyword, используемый для получения списка всех вакансий,
+17. У класса DBManager есть метод get_vacancies_with_keyword, используемый для получения списка всех вакансий,
     в названии которых содержатся переданные в метод слова.
     ```
     db_manager = DBManager("test")
