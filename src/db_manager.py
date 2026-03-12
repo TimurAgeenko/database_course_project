@@ -145,24 +145,37 @@ class DBManager:
 
         self.conn.commit()
 
-    def get_companies_and_vacancies_count(self) -> list[tuple[str, int]]:
+    def get_companies_and_vacancies_count(self) -> list[dict[str, str | int]]:
         """Метод для получения списка всех компаний и количества вакансий у каждой компании."""
         cur = self.conn.cursor()
+        json_data = []
 
         cur.execute("SELECT employer_name, COUNT(*) as count FROM vacancies GROUP BY employer_name")
         data = cur.fetchall()
 
-        return data
+        for employer_name, count in data:
+            json_data.append({"employer_name": employer_name, "vacancies_count": count})
 
-    def get_all_vacancies(self) -> list[tuple]:
+        return json_data
+
+    def get_all_vacancies(self) -> list[dict[str, str]]:
         """Метод для получения списка всех вакансий с указанием названия компании,
         названия вакансии, зарплаты и ссылки на вакансию."""
         cur = self.conn.cursor()
+        json_data = []
 
         cur.execute("SELECT employer_name, vacancy_name, salary_str, url FROM vacancies")
         vacancies = cur.fetchall()
 
-        return vacancies
+        for employer_name, vacancy_name, salary, url in vacancies:
+            json_data.append({
+                "employer_name": employer_name,
+                "vacancy_name": vacancy_name,
+                "salary": salary,
+                "url": url
+            })
+
+        return json_data
 
     def get_avg_salary(self):
         """Метод для получения средней зарплаты по всем вакансиям."""
@@ -179,32 +192,58 @@ class DBManager:
 
         return average
 
-    def get_vacancies_with_higher_salary(self) -> list[tuple]:
+    def get_vacancies_with_higher_salary(self) -> list[dict[str, str]]:
         """Метод для получения списка всех вакансий, у которых верхний край
         зарплатной вилки выше средней зарплаты по всем вакансиям."""
         cur = self.conn.cursor()
         average_salary = self.get_avg_salary()
+        json_data = []
 
         cur.execute(
             f"""
-            SELECT * FROM vacancies
+            SELECT employer_name, vacancy_name, salary_str, url FROM vacancies
             WHERE salary_to > {average_salary}
             """
         )
         vacancies = cur.fetchall()
 
-        return vacancies
+        for employer_name, vacancy_name, salary, url in vacancies:
+            json_data.append({
+                "employer_name": employer_name,
+                "vacancy_name": vacancy_name,
+                "salary": salary,
+                "url": url
+            })
 
-    def get_vacancies_with_keyword(self, keywords: str) -> list[tuple]:
+        return json_data
+
+    def get_vacancies_with_keyword(self, keywords: list) -> list[dict[str, str]]:
         """Метод для получения списка всех вакансий, в названии которых содержатся переданные в метод слова."""
         cur = self.conn.cursor()
+        json_data = []
+
+        if len(keywords) == 1:
+            keywords_string = f"vacancy_name LIKE '%{keywords[0]}%'"
+        else:
+            keywords_string = ""
+            for keyword in keywords:
+                keywords_string += f"vacancy_name LIKE '%{keyword}%' AND"
+            keywords_string = keywords_string[:-4]
 
         cur.execute(
             f"""
-            SELECT * FROM vacancies
-            WHERE vacancy_name LIKE '%{keywords}%'
+            SELECT employer_name, vacancy_name, salary_str, url FROM vacancies
+            WHERE {keywords_string}
             """
         )
         vacancies = cur.fetchall()
 
-        return vacancies
+        for employer_name, vacancy_name, salary, url in vacancies:
+            json_data.append({
+                "employer_name": employer_name,
+                "vacancy_name": vacancy_name,
+                "salary": salary,
+                "url": url
+            })
+
+        return json_data

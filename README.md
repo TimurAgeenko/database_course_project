@@ -98,8 +98,20 @@ HeadHunter's Hunter - это приложение для поиска работ
      "password"="123"
    }
    ```
+   
+6. Функция save_data_to_file используется для сохранения информации в файл. При вызове нужно передать имя для файла
+   без указания расширения, данные и путь по которому будет лежать файл. Если путь не передан, то по умолчанию
+   будет передан следующий путь: "../data/".
+   ```
+   data = [
+        {"employer_name": "employer_name1", "count": "count2"},
+        {"employer_name": "employer_name1", "count": "count2"}
+    ]
 
-6. Класс DBManager используется для взаимодействия с базой данных. При инициализации объекта нужно передать
+    save_data_to_file("vacancies_count", data)
+   ```
+
+7. Класс DBManager используется для взаимодействия с базой данных. При инициализации объекта нужно передать
    название для базы данных и путь к файлу database.ini, если путь не передан, то по умолчанию будет передан
    следующий путь: "../database.ini". При инициализации объекта создаются база данных и две таблицы: employers и
    vacancies, если база данных с переданным названием существует, в консоль выведется сообщение:
@@ -108,7 +120,7 @@ HeadHunter's Hunter - это приложение для поиска работ
    db_manager = DBManager("test")
    ```
    
-7. У класса DBManager есть метод create_database, который используется для создания базы данных.
+8. У класса DBManager есть метод create_database, который используется для создания базы данных.
    ```
    db_manager = DBManager("test") # При инициализации метод вызывается автоматически
    
@@ -117,19 +129,19 @@ HeadHunter's Hunter - это приложение для поиска работ
    db_manager.create_database("test1") # Создание новой базы данных
    ```
    
-8. У класса DBManager есть метод drop_database, который используется для удаления базы данных.
+9. У класса DBManager есть метод drop_database, который используется для удаления базы данных.
    ```
    db_manager = DBManager("test")
    
    db_manager.drop_database("test")
    ```
    
-9. У класса DBManager есть метод create_tables, который используется для создания двух таблиц: employers и vacancies.
-   ```
-   db_manager = DBManager("test") # При инициализации метод вызывается автоматически
-   ```
+10. У класса DBManager есть метод create_tables, который используется для создания двух таблиц: employers и vacancies.
+    ```
+    db_manager = DBManager("test") # При инициализации метод вызывается автоматически
+    ```
    
-10. У класса DBManager есть метод save_data_to_db, который используется для сохранения данных о работодателях
+11. У класса DBManager есть метод save_data_to_db, который используется для сохранения данных о работодателях
     и вакансиях в соответствующие таблицы в базе данных.
     ```
     db_manager = DBManager("test")
@@ -140,7 +152,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     db_manager.save_data_to_db(employers, vacancies)
     ```
    
-11. У класса DBManager есть метод get_companies_and_vacancies_count, который используется
+12. У класса DBManager есть метод get_companies_and_vacancies_count, который используется
     для получения списка всех компаний и количества вакансий у каждой компании.
     ```
     db_manager = DBManager("test")
@@ -152,7 +164,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     [("company_name1", "vacancy_count1"), ("company_name2", "vacancy_count2"), ...]
     ```
     
-12. У класса DBManager есть метод get_all_vacancies, который используется для получения списка всех вакансий
+13. У класса DBManager есть метод get_all_vacancies, который используется для получения списка всех вакансий
     с указанием названия компании, названия вакансии, зарплаты и ссылки на вакансию.
     ```
     db_manager = DBManager("test")
@@ -164,7 +176,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     [("company_name1", "vacancy_name1", "salary1", "url1"), ...]
     ```
     
-13. У класса DBManager есть метод get_avg_salary, который используется для получения средней зарплаты по всем вакансиям.
+14. У класса DBManager есть метод get_avg_salary, который используется для получения средней зарплаты по всем вакансиям.
     ```
     db_manager = DBManager("test")
     
@@ -172,7 +184,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     print(average_salary) # Выведет число
     ```
     
-14. У класса DBManager есть метод get_vacancies_with_higher_salary, используемый для получения
+15. У класса DBManager есть метод get_vacancies_with_higher_salary, используемый для получения
     списка всех вакансий, у которых верхний край зарплатной вилки выше средней зарплаты по всем вакансиям.
     ```
     db_manager = DBManager("test")
@@ -184,7 +196,7 @@ HeadHunter's Hunter - это приложение для поиска работ
     [("vacancy_id1", "vacancy_name1", "department1", "employer_name1", ...), ...]
     ```
     
-15. У класса DBManager есть метод get_vacancies_with_keyword, используемый для получения списка всех вакансий,
+16. У класса DBManager есть метод get_vacancies_with_keyword, используемый для получения списка всех вакансий,
     в названии которых содержатся переданные в метод слова.
     ```
     db_manager = DBManager("test")
