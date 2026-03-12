@@ -35,11 +35,9 @@ def test_db_manager_get_companies_and_vacancies_count(employers, vacancies):
     db_manager.save_data_to_db(employers, vacancies)
 
     data = db_manager.get_companies_and_vacancies_count()
-    employer = data[0][0]
-    vacancies_count = data[0][1]
 
-    assert employer == "Яндекс"
-    assert vacancies_count == 1
+    assert data[0]["employer_name"] == "Яндекс"
+    assert data[0]["vacancies_count"] == 1
 
     db_manager.drop_database("test", "./database.ini")
 
@@ -50,14 +48,10 @@ def test_db_manager_get_all_vacancies(employers, vacancies):
 
     vacancies = db_manager.get_all_vacancies()
 
-    assert vacancies == [
-        (
-            "Яндекс",
-            "Специалист по договорной работе",
-            "50000-70000 RUR",
-            "https://api.hh.ru/vacancies/130355798?host=hh.ru",
-        )
-    ]
+    assert vacancies[0]["employer_name"] == "Яндекс"
+    assert vacancies[0]["vacancy_name"] == "Специалист по договорной работе"
+    assert vacancies[0]["salary"] == "50000-70000 RUR"
+    assert vacancies[0]["url"] == "https://api.hh.ru/vacancies/130355798?host=hh.ru"
 
     db_manager.drop_database("test", "./database.ini")
 
@@ -79,7 +73,10 @@ def test_db_manager_get_vacancies_with_higher_salary(employers, vacancies):
 
     vacancies = db_manager.get_vacancies_with_higher_salary()
 
-    assert vacancies[0][0] == 130355798
+    assert vacancies[0]["employer_name"] == "Яндекс"
+    assert vacancies[0]["vacancy_name"] == "Специалист по договорной работе"
+    assert vacancies[0]["salary"] == "50000-70000 RUR"
+    assert vacancies[0]["url"] == "https://api.hh.ru/vacancies/130355798?host=hh.ru"
 
     db_manager.drop_database("test", "./database.ini")
 
@@ -88,10 +85,13 @@ def test_db_manager_get_vacancies_with_keyword(employers, vacancies):
     db_manager = DBManager("test", "./database.ini")
     db_manager.save_data_to_db(employers, vacancies)
 
-    vacancies = db_manager.get_vacancies_with_keyword("Специалист")
-    assert vacancies[0][0] == 130355798
+    vacancies = db_manager.get_vacancies_with_keyword(["Специалист"])
+    assert vacancies[0]["employer_name"] == "Яндекс"
+    assert vacancies[0]["vacancy_name"] == "Специалист по договорной работе"
+    assert vacancies[0]["salary"] == "50000-70000 RUR"
+    assert vacancies[0]["url"] == "https://api.hh.ru/vacancies/130355798?host=hh.ru"
 
-    vacancies = db_manager.get_vacancies_with_keyword("машинам")
+    vacancies = db_manager.get_vacancies_with_keyword(["машинам"])
     assert vacancies == []
 
     db_manager.drop_database("test", "./database.ini")
